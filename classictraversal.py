@@ -4,6 +4,7 @@ import struct
 import copy
 from hashlib import sha256
 from collections import namedtuple
+from functools import wraps
 
 H = 8
 AUTH = [None] * H
@@ -11,11 +12,24 @@ TREEHASH = [None] * H
 
 Node = namedtuple('Node', ['h', 'v'])
 
+cost = 0
 
+
+def countcost(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        global cost
+        cost += 1
+        return fn(*args, **kwargs)
+    return wrapper
+
+
+@countcost
 def leafcalc(j):
     return sha256(struct.pack("I", j)).digest()
 
 
+@countcost
 def g(v):
     return sha256(v).digest()
 
@@ -123,3 +137,8 @@ if __name__ == "__main__":
     for s in range(2 ** H):
         root = compute_root(s, classic_merkle_traversal(s))
         print('iteration {}: {}'.format(s, root == correct_root))
+    keygen_and_setup()
+    cost = 0
+    for s in range(2 ** H):
+        classic_merkle_traversal(s)
+    print('total cost: {}'.format(cost))
