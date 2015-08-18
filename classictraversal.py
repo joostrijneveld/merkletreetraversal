@@ -77,7 +77,7 @@ class Treehash(object):
 
 
 def keygen_and_setup():
-    """Sets up TREEHASH and AUTH for the start of classic_merkle_traversal."""
+    """Sets up TREEHASH and AUTH for the start of classic Merkle traversal."""
     for h in range(H):
         TREEHASH[h] = Treehash(h, completed=True)
     stack = []
@@ -98,11 +98,8 @@ def keygen_and_setup():
     return stack.pop()
 
 
-def classic_merkle_traversal(s):
-    """Performs one traversal and two updates, returns the auth nodes."""
-    authpath = copy.copy([x for x in AUTH])
-
-    # refresh
+def refresh_auth_nodes(s):
+    """Gathers contents for AUTH and restarts Treehash instances."""
     for h in [h for h in range(H) if ((s + 1) % (2 ** h)) == 0]:
         if TREEHASH[h].stack:  # prevent going past 2^H'th leaf node
             AUTH[h] = TREEHASH[h].stack[0]
@@ -110,11 +107,19 @@ def classic_merkle_traversal(s):
             if startidx < 2 ** H:
                 TREEHASH[h].__init__(h, startidx)
 
-    # and build stacks
+
+def build_stacks():
+    """Updates the Treehash instances."""
     for h in range(H):
         TREEHASH[h].update()
         TREEHASH[h].update()
 
+
+def traverse(s):
+    """Returns the auth nodes required for the next path."""
+    authpath = copy.copy([x for x in AUTH])
+    refresh_auth_nodes(s)
+    build_stacks()
     return authpath
 
 
@@ -139,10 +144,10 @@ if __name__ == "__main__":
     print('Treehash class: {}'.format(th.stack[0].v == correct_root))
     keygen_and_setup()
     for s in range(2 ** H):
-        root = compute_root(s, classic_merkle_traversal(s))
+        root = compute_root(s, traverse(s))
         print('iteration {}: {}'.format(s, root == correct_root))
     keygen_and_setup()
     cost = 0
     for s in range(2 ** H):
-        classic_merkle_traversal(s)
+        traverse(s)
     print('total cost: {}'.format(cost))
