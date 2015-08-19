@@ -85,8 +85,6 @@ def keygen_and_setup():
         node1 = Node(h=0, v=leafcalc(j))
         if j == 0:
             TREEHASH[0].stack = [node1]
-        if j == 1:
-            AUTH[0] = node1
         while stack and stack[-1].h == node1.h:
             if not AUTH[node1.h]:
                 AUTH[node1.h] = node1
