@@ -62,6 +62,8 @@ class Treehash(object):
         self.h = h
 
     def update(self):
+        """Performs one unit of computation on the stack. This can imply either
+        the introduction a new leaf node or the computation of a parent node"""
         if self.completed:
             return
         if len(self.stack) >= 2 and self.stack[-1].h == self.stack[-2].h:
