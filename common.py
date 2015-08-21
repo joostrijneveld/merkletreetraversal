@@ -49,10 +49,10 @@ def treehash(h):
 def compute_root(H, idx, authpath):
     """Computes the root node of the tree from leaf idx using the auth path."""
     v = leafcalc(idx)
-    for h in range(H):
+    for authnode in authpath:
         if idx & 1:
-            v = g(authpath[h].v + v)
+            v = g(authnode.v + v)
         else:
-            v = g(v + authpath[h].v)
+            v = g(v + authnode.v)
         idx >>= 1
     return v

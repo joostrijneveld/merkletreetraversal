@@ -56,11 +56,10 @@ def keygen_and_setup():
 def refresh_auth_nodes(s):
     """Gathers contents for AUTH and restarts Treehash instances."""
     for h in [h for h in range(H) if ((s + 1) % (2 ** h)) == 0]:
-        if TREEHASH[h].stack:  # prevent going past 2^H'th leaf node
-            AUTH[h] = TREEHASH[h].stack[0]
-            startidx = (s + 1 + 2 ** h) ^ (2 ** h)
-            if startidx < 2 ** H:
-                TREEHASH[h].__init__(h, startidx)
+        AUTH[h] = TREEHASH[h].stack[0]
+        startidx = (s + 1 + 2 ** h) ^ (2 ** h)
+        if startidx < 2 ** H:  # prevent going past 2^H'th leaf node
+            TREEHASH[h].__init__(h, startidx)
 
 
 def build_stacks():
@@ -72,7 +71,7 @@ def build_stacks():
 
 def traverse(s):
     """Returns the auth nodes required for the next path."""
-    authpath = copy.copy([x for x in AUTH])
+    authpath = copy.copy(AUTH)
     refresh_auth_nodes(s)
     build_stacks()
     return authpath

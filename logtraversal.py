@@ -12,7 +12,7 @@ Treehash.low = lambda self: min(node.h for node in self.stack)
 
 def traverse(s):
     """Returns the auth nodes by updating the most needed stacks first."""
-    authpath = copy.copy([x for x in AUTH])
+    authpath = copy.copy(AUTH)
     refresh_auth_nodes(s)
 
     # build stacks
