@@ -2,13 +2,15 @@
 
 from collections import deque
 from common import Node, leafcalc, g, recursive_hash, compute_root
-from classictraversal import H, AUTH, TREEHASH
 
+H = 8
 K = 4
 assert K >= 2 and (H - K) % 2 == 0
 
 STACK = []
+AUTH = [None] * H
 KEEP = [None] * H
+TREEHASH = [None] * H
 RETAIN = [deque() for x in range(H)]
 
 
