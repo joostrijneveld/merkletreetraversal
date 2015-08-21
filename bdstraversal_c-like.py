@@ -43,8 +43,8 @@ class Treehash(object):
         for node in STACK:
             if node.h < r:
                 r = node.h
-        if self.completed and self.node.h < r:
-            return self.node.h
+        if self.completed and self.h < r:  # self.h == self.node.h
+            return self.h
         return r
 
 
