@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 
 from collections import deque
-from classictraversal import (Node, leafcalc, g, recursive_hash, compute_root,
-                              H, AUTH, TREEHASH)
+from common import Node, leafcalc, g, recursive_hash, compute_root
+from classictraversal import H, AUTH, TREEHASH
 
 K = 4
 assert K >= 2 and (H - K) % 2 == 0
@@ -111,7 +111,7 @@ def traverse(s):
 if __name__ == "__main__":
     correct_root = recursive_hash(H)
     keygen_and_setup()
-    print('leaf 0: {}'.format(compute_root(0, AUTH) == correct_root))
+    print('leaf 0: {}'.format(compute_root(H, 0, AUTH) == correct_root))
     for s in range(2 ** H - 1):
-        root = compute_root(s + 1, traverse(s))
+        root = compute_root(H, s + 1, traverse(s))
         print('leaf {}: {}'.format(s + 1, root == correct_root))

@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 
 import copy
-from classictraversal import (recursive_hash, compute_root, refresh_auth_nodes,
-                              Treehash, keygen_and_setup, H, AUTH, TREEHASH)
+from common import recursive_hash, compute_root
+from classictraversal import (refresh_auth_nodes, Treehash, keygen_and_setup,
+                              H, AUTH, TREEHASH)
 
 
 # monkey patch a bound function that enables easily using STACK_h.low
@@ -38,5 +39,5 @@ if __name__ == "__main__":
     correct_root = recursive_hash(H)
     keygen_and_setup()
     for s in range(2 ** H):
-        root = compute_root(s, traverse(s))
+        root = compute_root(H, s, traverse(s))
         print('iteration {}: {}'.format(s, root == correct_root))
