@@ -49,7 +49,7 @@ def keygen_and_setup():
     stack = []
     for j in range(2 ** H):
         node1 = Node(h=0, v=leafcalc(j))
-        if j == 3:
+        if node1.h < H - K and j == 3:
             TREEHASH[0].node = node1
         while stack and stack[-1].h == node1.h:
             if not AUTH[node1.h]:
@@ -57,7 +57,7 @@ def keygen_and_setup():
             else:  # in this case node1 is a right-node with row-index 2j + 3
                 if node1.h < H - K and TREEHASH[node1.h].node is None:
                     TREEHASH[node1.h].node = node1
-                if node1.h >= H - K:
+                elif node1.h >= H - K:
                     RETAIN[node1.h].appendleft(node1)
             node2 = stack.pop()
             node1 = Node(h=node1.h + 1, v=g(node2.v + node1.v))
