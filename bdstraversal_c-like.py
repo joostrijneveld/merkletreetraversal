@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 
-from collections import deque
 from common import Node, leafcalc, g, recursive_hash, compute_root
 
 H = 8
@@ -10,8 +9,8 @@ assert K >= 2 and (H - K) % 2 == 0
 STACK = []
 AUTH = [None] * H
 KEEP = [None] * H
-TREEHASH = [None] * H
-RETAIN = [deque() for x in range(H)]
+TREEHASH = [None] * (H - K)
+RETAIN = [None] * ((1 << K) - K - 1)
 
 
 class Treehash(object):
@@ -40,8 +39,13 @@ class Treehash(object):
             self.node = STACK.pop()
 
     def height(self):
-        nodes = STACK + ([self.node] if self.node else [])
-        return min(node.h for node in nodes)
+        r = H
+        for node in STACK:
+            if node.h < r:
+                r = node.h
+        if self.completed and self.node.h < r:
+            return self.node.h
+        return r
 
 
 def keygen_and_setup():
@@ -49,18 +53,20 @@ def keygen_and_setup():
     for h in range(H - K):
         TREEHASH[h] = Treehash(h, completed=True)
     stack = []
-    for j in range(2 ** H):
+    for j in range(1 << H):
         node1 = Node(h=0, v=leafcalc(j))
         if node1.h < H - K and j == 3:
             TREEHASH[0].node = node1
         while stack and stack[-1].h == node1.h:
-            if not AUTH[node1.h]:
+            if j >> node1.h == 1:
                 AUTH[node1.h] = node1
             else:  # in this case node1 is a right-node with row-index 2j + 3
-                if node1.h < H - K and TREEHASH[node1.h].node is None:
+                if node1.h < H - K and j >> node1.h == 3:
                     TREEHASH[node1.h].node = node1
                 elif node1.h >= H - K:
-                    RETAIN[node1.h].appendleft(node1)
+                    offset = (1 << (H - 1 - node1.h)) + node1.h - H
+                    rowidx = ((j >> node1.h) - 3) >> 1
+                    RETAIN[offset + rowidx] = node1
             node2 = stack.pop()
             node1 = Node(h=node1.h + 1, v=g(node2.v + node1.v))
         stack.append(node1)
@@ -69,7 +75,10 @@ def keygen_and_setup():
 
 def traverse(s):
     """Returns the auth nodes for leaf s + 1."""
-    tau = next(h for h in range(H) if not (s >> h) & 1)
+    for h in range(H):
+        if not (s >> h) & 1:
+            tau = h
+            break
 
     if not (s >> (tau+1)) & 1 and tau < H - 1:
         KEEP[tau] = AUTH[tau]
@@ -79,24 +88,24 @@ def traverse(s):
 
     else:
         AUTH[tau] = Node(h=tau, v=g(AUTH[tau - 1].v + KEEP[tau - 1].v))
-        KEEP[tau - 1] = None
         for h in range(tau):
             if h < H - K:
                 AUTH[h] = TREEHASH[h].node
-                TREEHASH[h].node = None
             else:
-                AUTH[h] = RETAIN[h].pop()
-        for h in range(min(tau, H - K)):
-            startidx = s + 1 + 3 * 2**h
-            if startidx < 2 ** H:
+                offset = (1 << (H - 1 - h)) + h - H
+                rowidx = ((s >> h) - 1) >> 1
+                AUTH[h] = RETAIN[offset + rowidx]
+        for h in range(tau if (tau < H - K) else H - K):
+            startidx = s + 1 + 3 * (1 << h)
+            if startidx < 1 << H:
                 TREEHASH[h].__init__(h, startidx)
 
-    for _ in range((H - K) // 2):
-        l_min = float('inf')
-        h = None
+    for _ in range((H - K) >> 1):
+        l_min = H
+        h = H+1
         for j in range(H - K):
             if TREEHASH[j].completed:
-                low = float('inf')
+                low = H
             elif TREEHASH[j].stackusage == 0:
                 low = j
             else:
@@ -104,7 +113,7 @@ def traverse(s):
             if low < l_min:
                 h = j
                 l_min = low
-        if h is not None:
+        if h != H+1:
             TREEHASH[h].update()
 
     return AUTH
@@ -114,6 +123,6 @@ if __name__ == "__main__":
     correct_root = recursive_hash(H)
     keygen_and_setup()
     print('leaf 0: {}'.format(compute_root(H, 0, AUTH) == correct_root))
-    for s in range(2 ** H - 1):
+    for s in range((1 << H) - 1):
         root = compute_root(H, s + 1, traverse(s))
         print('leaf {}: {}'.format(s + 1, root == correct_root))
