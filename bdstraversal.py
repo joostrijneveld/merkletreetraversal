@@ -41,8 +41,7 @@ class Treehash(object):
             self.stackusage -= 1
 
     def height(self):
-        nodes = STACK[-self.stackusage:] + ([self.node] if self.node else [])
-        return min(node.h for node in nodes)
+        return min(node.h for node in STACK[-self.stackusage:])
 
 
 def keygen_and_setup():
