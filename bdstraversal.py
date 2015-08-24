@@ -40,7 +40,7 @@ class Treehash(object):
             self.node = STACK.pop()
 
     def height(self):
-        nodes = STACK + ([self.node] if self.node else [])
+        nodes = STACK[-self.stackusage:] + ([self.node] if self.node else [])
         return min(node.h for node in nodes)
 
 

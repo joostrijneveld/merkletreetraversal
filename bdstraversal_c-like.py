@@ -40,7 +40,7 @@ class Treehash(object):
 
     def height(self):
         r = H
-        for node in STACK:
+        for node in STACK[-self.stackusage:]:
             if node.h < r:
                 r = node.h
         if self.completed and self.h < r:  # self.h == self.node.h
