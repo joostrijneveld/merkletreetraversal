@@ -101,7 +101,7 @@ def traverse(s):
 
     for _ in range((H - K) >> 1):
         l_min = H
-        h = H+1
+        h = H - K
         for j in range(H - K):
             if TREEHASH[j].completed:
                 low = H
@@ -112,7 +112,7 @@ def traverse(s):
             if low < l_min:
                 h = j
                 l_min = low
-        if h != H+1:
+        if h != H - K:
             TREEHASH[h].update()
 
     return AUTH
