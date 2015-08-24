@@ -38,6 +38,7 @@ class Treehash(object):
         if self.stackusage == 1 and STACK[-1].h == self.h:
             self.completed = True
             self.node = STACK.pop()
+            self.stackusage -= 1
 
     def height(self):
         nodes = STACK[-self.stackusage:] + ([self.node] if self.node else [])
