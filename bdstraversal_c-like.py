@@ -87,7 +87,7 @@ def traverse(s):
         AUTH[0] = Node(h=0, v=leafcalc(s))
 
     else:
-        AUTH[tau] = Node(h=tau, v=g(AUTH[tau - 1].v + KEEP[tau - 1].v))
+        AUTH[tau] = Node(h=0, v=g(AUTH[tau - 1].v + KEEP[tau - 1].v))
         for h in range(tau):
             if h < H - K:
                 AUTH[h] = TREEHASH[h].node
