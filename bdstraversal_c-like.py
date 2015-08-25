@@ -75,11 +75,11 @@ def keygen_and_setup():
 def traverse(s):
     """Returns the auth nodes for leaf s + 1."""
     for h in range(H):
-        if not (s >> h) & 1:
+        if not ((s >> h) & 1):
             tau = h
             break
 
-    if not (s >> (tau+1)) & 1 and tau < H - 1:
+    if not ((s >> (tau+1)) & 1) and tau < H - 1:
         KEEP[tau] = AUTH[tau]
 
     if tau == 0:
