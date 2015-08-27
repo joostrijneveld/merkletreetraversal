@@ -8,7 +8,7 @@ assert K >= 2 and (H - K) % 2 == 0
 
 STACK = []
 AUTH = [None] * H
-KEEP = [None] * H
+KEEP = [None] * (H // 2)
 TREEHASH = [None] * (H - K)
 RETAIN = [None] * ((1 << K) - K - 1)
 
@@ -79,14 +79,17 @@ def traverse(s):
             tau = h
             break
 
+    if tau > 0:
+        tempKEEP = KEEP[(tau - 1) >> 1]  # prevent overwriting too soon
+
     if not ((s >> (tau+1)) & 1) and tau < H - 1:
-        KEEP[tau] = AUTH[tau]
+        KEEP[tau >> 1] = AUTH[tau]
 
     if tau == 0:
         AUTH[0] = Node(h=0, v=leafcalc(s))
 
     else:
-        AUTH[tau] = Node(h=0, v=g(AUTH[tau - 1].v + KEEP[tau - 1].v))
+        AUTH[tau] = Node(h=0, v=g(AUTH[tau - 1].v + tempKEEP.v))
         for h in range(tau):
             if h < H - K:
                 AUTH[h] = TREEHASH[h].node

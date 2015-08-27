@@ -9,9 +9,9 @@ assert K >= 2 and (H - K) % 2 == 0
 
 STACK = []
 AUTH = [None] * H
-KEEP = [None] * H
-TREEHASH = [None] * H
-RETAIN = [deque() for x in range(H)]
+KEEP = [None] * H  # 'two nodes sharing an entry' was left out for readability
+TREEHASH = [None] * (H - K)
+RETAIN = [deque() for x in range(2 ** K - K - 1)]
 
 
 class Treehash(object):
