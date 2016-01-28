@@ -128,9 +128,10 @@ class BDSState(object):
                 if low < l_min:
                     h = j
                     l_min = low
-            if h != H - K:
-                self.treehash[h].update()
-                n -= 1
+            if h == H - K:
+                break
+            self.treehash[h].update()
+            n -= 1
         return n
 
     def traverse_and_update(self, s):
