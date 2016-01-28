@@ -160,22 +160,14 @@ class MTBDSState(object):
         self.nextstates[0].nextidx += 1
         for i in range(D):
             if not end_of_tree(s, H, i):
-                if i == 0:
-                    self.currstates[0].traverse(s & ((1<<H)-1))
-                    updates = self.currstates[0].update(updates)
-                else:
-                    if i == needswap_upto+1:
-                        self.currstates[i].traverse((s >> (H*i)) & ((1<<H)-1))
-                    while updates > 0:
-                        remaining = self.currstates[i].update(updates)
-                        if remaining == updates:
-                            break
-                        updates = remaining
-                    nxt = self.nextstates[i]
-                    if updates > 0 and nxt.nextidx < (1 << H):
-                        nxt.stack_update(nxt.nextidx)
-                        nxt.nextidx += 1
-                        updates -= 1
+                if i == needswap_upto+1:
+                    self.currstates[i].traverse((s >> (H*i)) & ((1<<H)-1))
+                updates = self.currstates[i].update(updates)
+                nxt = self.nextstates[i]
+                if i > 0 and updates > 0 and nxt.nextidx < (1 << H):
+                    nxt.stack_update(nxt.nextidx)
+                    nxt.nextidx += 1
+                    updates -= 1
             else:
                 needswap_upto = i
                 self.currstates[i] = self.nextstates[i]
