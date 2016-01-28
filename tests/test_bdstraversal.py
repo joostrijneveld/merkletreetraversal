@@ -40,4 +40,5 @@ def test_mt_state_traversal():
         for i, path in enumerate(authpaths):
             idx = (s >> (H*i)) & ((1 << H) - 1)
             assert compute_root(H, idx, path) == correct_root
-        states.traverse(s)
+        if s + 1 < 2 ** (D*H):
+            states.traverse(s)
