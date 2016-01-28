@@ -8,6 +8,7 @@ python:
 
 install:
   - pip install coveralls
+  - pip install nose2
 
 script:
   - coverage run -m nose2
