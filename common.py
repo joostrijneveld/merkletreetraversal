@@ -46,6 +46,10 @@ def treehash(h):
     return stack.pop()
 
 
+def end_of_tree(idx, tree_h, level):
+    return ((idx + 1) & ((1 << ((level+1)*tree_h)) - 1)) == 0
+
+
 def compute_root(H, idx, authpath):
     """Computes the root node of the tree from leaf idx using the auth path."""
     v = leafcalc(idx)

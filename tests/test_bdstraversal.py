@@ -29,3 +29,15 @@ def test_state_traversal():
         auth = state.traverse_and_update(s)
         assert compute_root(H, s + 1, auth) == correct_root
 
+
+def test_mt_state_traversal():
+    from bdstraversal_mt_c_like import MTBDSState, H, D
+    correct_root = recursive_hash(H)
+    states = MTBDSState()
+    states.keygen_and_setup()
+    for s in range(2 ** (D*H)):
+        authpaths = states.authpaths()
+        for i, path in enumerate(authpaths):
+            idx = (s >> (H*i)) & ((1 << H) - 1)
+            assert compute_root(H, idx, path) == correct_root
+        states.traverse(s)
